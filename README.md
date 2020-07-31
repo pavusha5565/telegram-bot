@@ -1,12 +1,13 @@
-#Телеграм бот
+# Телеграм бот
 Стартовая версия телеграм бота на основе nestjs, typeorm, telegraf ( nestjs-telegraf ). В качестве БД используется postgres.
 
 ## Installation
 
-Установка зависимостей
+Установка зависимостей и копирование .env файла
 
 ```bash
 $ yarn install
+$ cp ./.env.example ./.env
 ```
 
 Установка docker контейнера с postgres БД
