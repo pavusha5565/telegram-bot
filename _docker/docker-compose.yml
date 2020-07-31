@@ -1,0 +1,10 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:11
+    ports:
+      - ${POSTGRES_BIND_HOST}:${POSTGRES_BIND_PORT}:5432
+    environment:
+      POSTGRES_USER: telegrambot
+      POSTGRES_PASSWORD: 12345678
+      POSTGRES_DB: telegrambot

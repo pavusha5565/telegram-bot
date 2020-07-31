@@ -1,0 +1,6 @@
+{
+  "watch": ["src"],
+  "ext": "ts",
+  "ignore": ["src/_migrations"],
+  "exec": "cross-env TS_NODE_FILES=true ts-node src/main.ts"
+}
