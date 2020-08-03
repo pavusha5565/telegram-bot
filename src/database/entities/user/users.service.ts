@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { User } from './users.entity';
 import { Context } from 'telegraf';
 import { getUserInfo } from '../../../utils/data';
 import { applyChanges } from '../../../utils/object';
 
 @Injectable()
-export class UserService {
+export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
@@ -32,7 +32,7 @@ export class UserService {
   }
 
   async getUserActiveCommand(ctx: Context): Promise<string> {
-    let user = await this.getUser(ctx);
+    const user = await this.getUser(ctx);
     return user.activeCommand;
   }
 
@@ -40,7 +40,7 @@ export class UserService {
     ctx: Context,
     command: string,
   ): Promise<string> {
-    let user = await this.getUser(ctx);
+    const user = await this.getUser(ctx);
 
     const updated = await this.usersRepository.update(user, {
       activeCommand: command,
