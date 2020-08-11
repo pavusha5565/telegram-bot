@@ -7,9 +7,16 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Compliments } from '../compiments/compliments.entity';
+import { DailyReport } from '../dailyReport/dailyReport.entity';
+import { Commands } from '../../../telegraf/commands';
 
-@Entity('users')
-export class User {
+export enum teamEnum {
+  designers = 'designers',
+  developers = 'developers',
+  projectManager = 'project_manager',
+}
+
+class UserFields {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -23,20 +30,32 @@ export class User {
   username: string;
 
   @Column({ nullable: true })
-  activeCommand: string;
+  activeCommand: Commands;
 
   @Column()
   chatId: number;
 
+  @Column({ nullable: true })
+  team: teamEnum;
+
+  @CreateDateColumn({ type: 'timestamptz', nullable: true })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamptz', nullable: true })
+  updated_at?: Date;
+}
+
+@Entity('users')
+export class User extends UserFields {
   @OneToMany(
     type => Compliments,
     compliments => compliments.creator_id,
   )
   compliments: Compliments[];
 
-  @CreateDateColumn({ type: 'timestamptz', nullable: true })
-  createdAt: Date;
-
-  @UpdateDateColumn({ type: 'timestamptz', nullable: true })
-  updated_at?: Date;
+  @OneToMany(
+    type => DailyReport,
+    dailyReport => dailyReport.user,
+  )
+  daily_report: DailyReport;
 }

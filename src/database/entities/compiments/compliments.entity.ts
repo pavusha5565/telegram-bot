@@ -12,8 +12,7 @@ export enum Sex {
   WOMAN = 'woman',
 }
 
-@Entity('compliments')
-export class Compliments {
+class ComplimentsFields {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -26,6 +25,12 @@ export class Compliments {
   @Column({ nullable: true })
   text: string;
 
+  @Column({ nullable: true })
+  creator_id: number;
+}
+
+@Entity('compliments')
+export class Compliments extends ComplimentsFields {
   @ManyToOne(
     type => User,
     user => user.compliments,
@@ -34,7 +39,4 @@ export class Compliments {
     name: 'creator_id',
   })
   user?: User;
-
-  @Column({ nullable: true })
-  creator_id: number;
 }

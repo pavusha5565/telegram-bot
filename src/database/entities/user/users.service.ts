@@ -3,8 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './users.entity';
 import { Context } from 'telegraf';
-import { getUserInfo } from '../../../utils/data';
+import { getUserActiveCommand, getUserInfo } from '../../../utils/data';
 import { applyChanges } from '../../../utils/object';
+import { Commands } from '../../../telegraf/commands';
 
 @Injectable()
 export class UsersService {
@@ -31,17 +32,15 @@ export class UsersService {
     return await this.usersRepository.save(newUser);
   }
 
-  async getUserActiveCommand(ctx: Context): Promise<string> {
+  async getActiveCommand(ctx: Context): Promise<Commands> {
     const user = await this.getUser(ctx);
-    return user.activeCommand;
+    return getUserActiveCommand(user);
   }
 
   async updateUserActiveCommand(
-    ctx: Context,
-    command: string,
-  ): Promise<string> {
-    const user = await this.getUser(ctx);
-
+    user: User,
+    command: Commands,
+  ): Promise<Commands> {
     const updated = await this.usersRepository.update(user, {
       activeCommand: command,
     });

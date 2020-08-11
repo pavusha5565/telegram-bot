@@ -1,1 +1,4 @@
-export enum commands {}
+export enum Commands {
+  DAILY = '/daily',
+  COMPLIMENTS = '/compliments',
+}

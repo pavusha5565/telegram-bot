@@ -1,21 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import {
   TelegrafStart,
-  TelegrafHelp,
-  TelegrafOn,
-  TelegrafHears,
   Context,
   TelegrafCommand,
-  TelegrafInlineQuery,
+  TelegrafHears,
 } from 'nestjs-telegraf';
+import { Commands } from '../commands';
 import { UsersService } from '../../database/entities/user/users.service';
 import { ComplimentsService } from '../../database/entities/compiments/compliments.service';
+import { getUserActiveCommand } from '../../utils/data';
+import { MyEventEmitter } from '../../app.events';
+import { InjectEventEmitter } from 'nest-emitter';
 
 @Injectable()
 export class UserTelegrafService {
   constructor(
     private readonly userService: UsersService,
     private readonly complimentsService: ComplimentsService,
+    @InjectEventEmitter() private readonly emitter: MyEventEmitter,
   ) {}
 
   @TelegrafStart()
@@ -24,9 +26,31 @@ export class UserTelegrafService {
     await ctx.reply('Привет: ' + user.firstName);
   }
 
-  @TelegrafCommand('/compliments')
+  @TelegrafCommand(Commands.COMPLIMENTS)
   async say(ctx: Context) {
     const compliments = await this.complimentsService.getRandomCompliment();
-    await ctx.reply(compliments?.text);
+    const user = await this.userService.getUser(ctx);
+    await ctx.reply(
+      user.firstName +
+        ', ' +
+        compliments?.text.charAt(0).toLowerCase() +
+        compliments?.text.slice(1),
+    );
+  }
+
+  @TelegrafHears(/.*/)
+  async hearsMessage(ctx: Context) {
+    const user = await this.userService.getUser(ctx);
+    const activeCommand = getUserActiveCommand(user);
+    switch (activeCommand) {
+      case Commands.DAILY: {
+        await ctx.reply('delegate to emit');
+        this.emitter.emit(activeCommand, ctx);
+        break;
+      }
+      default: {
+        await ctx.reply('delegate not to emited');
+      }
+    }
   }
 }
