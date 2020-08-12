@@ -9,7 +9,7 @@ import { Commands } from '../commands';
 import { UsersService } from '../../database/entities/user/users.service';
 import { ComplimentsService } from '../../database/entities/compiments/compliments.service';
 import { getUserActiveCommand } from '../../utils/data';
-import { MyEventEmitter } from '../../app.events';
+import { TelegramCommandEventEmiter } from '../../app.events';
 import { InjectEventEmitter } from 'nest-emitter';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class UserTelegrafService {
   constructor(
     private readonly userService: UsersService,
     private readonly complimentsService: ComplimentsService,
-    @InjectEventEmitter() private readonly emitter: MyEventEmitter,
+    @InjectEventEmitter() private readonly emitter: TelegramCommandEventEmiter,
   ) {}
 
   @TelegrafStart()
@@ -30,6 +30,7 @@ export class UserTelegrafService {
   async say(ctx: Context) {
     const compliments = await this.complimentsService.getRandomCompliment();
     const user = await this.userService.getUser(ctx);
+    await this.userService.updateUserActiveCommand(user, Commands.COMPLIMENTS);
     await ctx.reply(
       user.firstName +
         ', ' +
@@ -44,12 +45,11 @@ export class UserTelegrafService {
     const activeCommand = getUserActiveCommand(user);
     switch (activeCommand) {
       case Commands.DAILY: {
-        await ctx.reply('delegate to emit');
         this.emitter.emit(activeCommand, ctx);
         break;
       }
       default: {
-        await ctx.reply('delegate not to emited');
+        throw new Error('delegate not to emited in function hearsMessage');
       }
     }
   }

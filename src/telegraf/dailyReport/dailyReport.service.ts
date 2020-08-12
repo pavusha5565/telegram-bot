@@ -6,14 +6,19 @@ import { UsersService } from '../../database/entities/user/users.service';
 import { DailyReport } from '../../database/entities/dailyReport/dailyReport.entity';
 import { applyChanges } from '../../utils/object';
 import { getMessageText } from '../../utils/data';
-import { getStep, getStepMessage } from '../../utils/dailyStages';
+import {
+  dailySteps,
+  getMessageNextStep,
+  getStep,
+  getStepMessage,
+} from '../../utils/dailyStages';
 import { InjectEventEmitter } from 'nest-emitter';
-import { MyEventEmitter } from '../../app.events';
+import { TelegramCommandEventEmiter } from '../../app.events';
 
 @Injectable()
 export class DailyReportTelegrafService {
   constructor(
-    @InjectEventEmitter() private readonly emitter: MyEventEmitter,
+    @InjectEventEmitter() private readonly emitter: TelegramCommandEventEmiter,
     private readonly dailyReportService: DailyReportService,
     private readonly usersService: UsersService,
   ) {}
@@ -40,9 +45,12 @@ export class DailyReportTelegrafService {
       return ctx.reply('Для создания отчета нужно ввести /daily');
     }
     const currentStep = getStep(daily);
-    const nextDaily = new DailyReport();
-    applyChanges(nextDaily, { [currentStep]: getMessageText(ctx) });
-    await this.dailyReportService.updateDailyReport(daily, nextDaily);
-    await ctx.reply(getStepMessage(currentStep));
+    if (currentStep === dailySteps.DONE) {
+      return await this.usersService.updateUserActiveCommand(user);
+    }
+    await this.dailyReportService.updateDailyReport(daily, {
+      [currentStep]: getMessageText(ctx),
+    });
+    await ctx.reply(getMessageNextStep(currentStep));
   }
 }

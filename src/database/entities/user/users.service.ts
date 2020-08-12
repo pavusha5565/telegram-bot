@@ -32,18 +32,19 @@ export class UsersService {
     return await this.usersRepository.save(newUser);
   }
 
-  async getActiveCommand(ctx: Context): Promise<Commands> {
+  async getActiveCommandByContext(ctx: Context): Promise<Commands> {
     const user = await this.getUser(ctx);
     return getUserActiveCommand(user);
   }
 
   async updateUserActiveCommand(
     user: User,
-    command: Commands,
+    command: Commands | null = null,
   ): Promise<Commands> {
-    const updated = await this.usersRepository.update(user, {
+    await this.usersRepository.update(user.id, {
       activeCommand: command,
     });
-    return updated.raw.activeCommand;
+    const userCatched = await this.usersRepository.findOne(user.id);
+    return userCatched.activeCommand;
   }
 }

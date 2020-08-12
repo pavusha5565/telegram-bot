@@ -8,4 +8,7 @@ export interface AppEvents {
   [Commands.COMPLIMENTS]: Context;
 }
 
-export type MyEventEmitter = StrictEventEmitter<EventEmitter, AppEvents>;
+export type TelegramCommandEventEmiter = StrictEventEmitter<
+  EventEmitter,
+  AppEvents
+>;

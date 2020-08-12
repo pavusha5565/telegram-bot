@@ -7,17 +7,16 @@ export enum dailySteps {
 
 export const dailyMessage = {
   [dailySteps.YESTERDAY]: 'Что ты делал вчера?',
-  [dailySteps.TODAY]: 'Что ты делал сегодня?',
+  [dailySteps.TODAY]: 'Что ты сделаешь сегодня?',
   [dailySteps.BLOCKERS]: 'У тебя есть какие нибудь блокеры?',
   done: 'Все сделанно, поздравляю.',
-  undefined: 'Для создания отчета нужно написать /daily',
 };
 
-export function getStepMessage(step: string) {
+export function getStepMessage(step: dailySteps) {
   return dailyMessage[step] || dailyMessage.done;
 }
 
-export function getStep(dailyReport): string | null {
+export function getStep(dailyReport): dailySteps {
   const steps = Object.keys(dailySteps);
   for (const step of steps) {
     const value = dailySteps[step];
@@ -26,4 +25,10 @@ export function getStep(dailyReport): string | null {
     }
   }
   return dailySteps.DONE;
+}
+
+export function getMessageNextStep(step: dailySteps): string {
+  const steps = Object.keys(dailyMessage);
+  const index = steps.findIndex(s => s === step);
+  return dailyMessage[steps[index + 1]] || dailyMessage.done;
 }

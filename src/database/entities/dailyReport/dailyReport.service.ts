@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DailyReport } from './dailyReport.entity';
 import { Repository } from 'typeorm/index';
-import { addSimpleWhereIns } from '../../builderUtils';
 import { getStartOfToday } from '../../../utils/date';
 import { User } from '../user/users.entity';
 import { applyChanges } from '../../../utils/object';
@@ -55,12 +54,9 @@ export class DailyReportService {
     update: Partial<DailyReport>,
   ) {
     const daily = new DailyReport();
-    applyChanges(daily, {
-      yesterday: update.yesterday,
-      today: update.today,
-      blockers: update.blockers,
-    });
-    const updatedDaily = await this.dailyReportRepo.update(dailyReport, daily);
-    return updatedDaily.raw;
+    applyChanges(daily, update);
+    await this.dailyReportRepo.update(dailyReport.id, daily);
+    console.log(daily, update);
+    return await this.dailyReportRepo.findOne(dailyReport.id);
   }
 }
