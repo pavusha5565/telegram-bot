@@ -4,8 +4,7 @@ import { Context } from 'nestjs-telegraf';
 import { Commands } from './telegraf/commands';
 
 export interface AppEvents {
-  [Commands.DAILY]: Context;
-  [Commands.COMPLIMENTS]: Context;
+  testReq: string;
 }
 
 export type TelegramCommandEventEmiter = StrictEventEmitter<

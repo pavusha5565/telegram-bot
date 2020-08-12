@@ -7,7 +7,6 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Compliments } from '../compiments/compliments.entity';
-import { DailyReport } from '../dailyReport/dailyReport.entity';
 import { Commands } from '../../../telegraf/commands';
 
 export enum teamEnum {
@@ -52,10 +51,4 @@ export class User extends UserFields {
     compliments => compliments.creator_id,
   )
   compliments: Compliments[];
-
-  @OneToMany(
-    type => DailyReport,
-    dailyReport => dailyReport.user,
-  )
-  daily_report: DailyReport;
 }

@@ -5,7 +5,7 @@ import {
   TelegrafCommand,
   TelegrafHears,
 } from 'nestjs-telegraf';
-import { Commands } from '../commands';
+import { Commands, commandsDescription } from '../commands';
 import { UsersService } from '../../database/entities/user/users.service';
 import { ComplimentsService } from '../../database/entities/compiments/compliments.service';
 import { getUserActiveCommand } from '../../utils/data';
@@ -39,17 +39,23 @@ export class UserTelegrafService {
     );
   }
 
+  @TelegrafCommand(Commands.HELP)
+  async help(ctx: Context) {
+    const commands = Object.keys(commandsDescription).map(
+      command => `${command}: ${commandsDescription[command]}.`,
+    );
+    await ctx.reply(commands.join('\n'));
+  }
+
   @TelegrafHears(/.*/)
   async hearsMessage(ctx: Context) {
     const user = await this.userService.getUser(ctx);
     const activeCommand = getUserActiveCommand(user);
     switch (activeCommand) {
-      case Commands.DAILY: {
-        this.emitter.emit(activeCommand, ctx);
-        break;
-      }
       default: {
-        throw new Error('delegate not to emited in function hearsMessage');
+        await ctx.reply(
+          `Я не понял ничего... Вот тут мой словарь ${Commands.HELP}`,
+        );
       }
     }
   }
